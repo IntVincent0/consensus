@@ -1,31 +1,25 @@
 package main
 
 import (
-	"bufio"
-	"context"
-	"fmt"
 	"log"
 	"os"
-	"os/signal"
 	"sync"
-	"syscall"
-	"uuid"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/status"
-
-	pb "consensus/grpc"
 )
 
-
-struct Node {
-	int64 nodeId
-	string clock
-	string state = "released"
-	int port
+type Node struct {
+	nodeId int64
+	clock  string
+	state  string
+	port   int
 	mu     sync.Mutex
-	ports map[int]string
+	port   map[int]int
+}
+
+type Approval struct {
+	isApproved bool
 }
 
 func (n *Node) tick(receivedClock int64) int64 {
@@ -35,32 +29,47 @@ func (n *Node) tick(receivedClock int64) int64 {
 	return n.clock
 }
 
-func Request(clock int64, nodeId int64) {
-	for i, v := ports
+func (n *Node) Request(port int, node Node) {
+
 }
 
 func (n *Node) Enter(accessor Node) {
 	state = "wanted"
-	request(n.clock, n.nodeId);
-	for i = 0; i < ports.len(); i++ {
-		
+	for _, p := range ports {
+		go request(p, n)
 	}
 }
 
 func main() {
-	nodeMap := make(map[int]Node)
 	// pick the port when starting: ex. go run . 1
 	if len(os.Args) < 2 {
 		log.Fatal("usage: go run . <port>")
 	}
-	n.port := os.Args[1]
+	port := os.Args[1]
 
-	for i = 0; i < 3; i++ {
-		nodeMap[i] = new Node();
+	// Connect to own port
+	url := "http:localhost:" + port
+	conn, err := grpc.NewClient(url, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("event=CONNECT_FAILED")
 	}
+	defer conn.close()
+
+	for i := 1; i <= 3; i++ {
+		if i = port 
+	}
+
+	node := pb.NewChitChatServiceClient(conn)
+	n := &Node{
+		port: port,
+		state: "released"
+	}
+
+	n.mu.Lock()
+	n.clock++
+	ts := n.clock
+	n.mu.Unlock()
 }
-
-
 
 // package main
 

@@ -3,6 +3,10 @@ package consensus;
 
 message Nothing {}
 
+message Approval {
+    bool isApproved = 1;
+}
+
 message Node {
     int64 nodeId = 1;
     int64 lamport = 2;
@@ -14,8 +18,7 @@ message Message {
 }
 
 service ChitChatService {
-    rpc Request(Node) returns (Nothing)
-    rpc Response(Node) returns (Nothing)
+    rpc Request(Node) returns (Approval)
     
     rpc Enter(Node) returns (Nothing)
     rpc Write(Message) returns (Nothing)
