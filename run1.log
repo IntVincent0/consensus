@@ -1,0 +1,109 @@
+[Server] 2026/11/06 16:19:03.943327 Connected on port 5001
+[Server] 2026/11/06 16:19:06.105573 [5001] requesting access at lamport clock=1
+[Server] 2026/11/06 16:19:07.936098 Connected on port 5002
+[Server] 2026/11/06 16:19:08.312401 [5002] requesting access at lamport clock=1
+[Server] 2026/11/06 16:19:08.326424 [5001] deferring reply to 5002
+[Server] 2026/11/06 16:19:11.831381 Connected on port 5003
+[Server] 2026/11/06 16:19:14.120589 [5003] requesting access at lamport clock=4
+[Server] 2026/11/06 16:19:14.133137 [5002] deferring reply to 5003
+[Server] 2026/11/06 16:19:14.133183 [5001] deferring reply to 5003
+[Server] 2026/11/06 16:19:15.215238 [5001] entered critical section
+[Server] 2026/11/06 16:19:16.216444 [5001] exited critical section
+[Server] 2026/11/06 16:19:16.216761 [5002] entered critical section
+[Server] 2026/11/06 16:19:17.217847 [5002] exited critical section
+[Server] 2026/11/06 16:19:17.218181 [5003] entered critical section
+[Server] 2026/11/06 16:19:17.229550 [5001] requesting access at lamport clock=10
+[Server] 2026/11/06 16:19:17.229880 [5003] deferring reply to 5001
+[Server] 2026/11/06 16:19:17.430996 [5002] requesting access at lamport clock=14
+[Server] 2026/11/06 16:19:17.431297 [5003] deferring reply to 5002
+[Server] 2026/11/06 16:19:17.431364 [5001] deferring reply to 5002
+[Server] 2026/11/06 16:19:18.221402 [5003] exited critical section
+[Server] 2026/11/06 16:19:18.222140 [5001] entered critical section
+[Server] 2026/11/06 16:19:18.283863 [5003] requesting access at lamport clock=18
+[Server] 2026/11/06 16:19:18.284246 [5001] deferring reply to 5003
+[Server] 2026/11/06 16:19:18.284266 [5002] deferring reply to 5003
+[Server] 2026/11/06 16:19:19.223387 [5001] exited critical section
+[Server] 2026/11/06 16:19:19.224795 [5002] entered critical section
+[Server] 2026/11/06 16:19:20.225626 [5002] exited critical section
+[Server] 2026/11/06 16:19:20.226371 [5003] entered critical section
+[Server] 2026/11/06 16:19:20.423600 [5002] requesting access at lamport clock=23
+[Server] 2026/11/06 16:19:20.424990 [5003] deferring reply to 5002
+[Server] 2026/11/06 16:19:21.227634 [5003] exited critical section
+[Server] 2026/11/06 16:19:21.228185 [5002] entered critical section
+[Server] 2026/11/06 16:19:21.386128 [5003] requesting access at lamport clock=26
+[Server] 2026/11/06 16:19:21.388202 [5002] deferring reply to 5003
+[Server] 2026/11/06 16:19:21.821087 [5001] requesting access at lamport clock=29
+[Server] 2026/11/06 16:19:21.821745 [5002] deferring reply to 5001
+[Server] 2026/11/06 16:19:21.821745 [5003] deferring reply to 5001
+[Server] 2026/11/06 16:19:22.229346 [5002] exited critical section
+[Server] 2026/11/06 16:19:22.229684 [5003] entered critical section
+[Server] 2026/11/06 16:19:23.230849 [5003] exited critical section
+[Server] 2026/11/06 16:19:23.232756 [5001] entered critical section
+[Server] 2026/11/06 16:19:24.187551 [5002] requesting access at lamport clock=33
+[Server] 2026/11/06 16:19:24.188976 [5001] deferring reply to 5002
+[Server] 2026/11/06 16:19:24.233718 [5001] exited critical section
+[Server] 2026/11/06 16:19:24.234165 [5002] entered critical section
+[Server] 2026/11/06 16:19:24.813930 [5001] requesting access at lamport clock=37
+[Server] 2026/11/06 16:19:24.814322 [5002] deferring reply to 5001
+[Server] 2026/11/06 16:19:25.235288 [5002] exited critical section
+[Server] 2026/11/06 16:19:25.236126 [5001] entered critical section
+[Server] 2026/11/06 16:19:25.917648 [5003] requesting access at lamport clock=40
+[Server] 2026/11/06 16:19:25.918497 [5001] deferring reply to 5003
+[Server] 2026/11/06 16:19:26.237685 [5001] exited critical section
+[Server] 2026/11/06 16:19:26.238558 [5003] entered critical section
+[Server] 2026/11/06 16:19:27.239713 [5003] exited critical section
+[Server] 2026/11/06 16:19:27.499828 [5001] requesting access at lamport clock=44
+[Server] 2026/11/06 16:19:27.500342 [5001] entered critical section
+[Server] 2026/11/06 16:19:27.688969 [5003] requesting access at lamport clock=47
+[Server] 2026/11/06 16:19:27.690928 [5001] deferring reply to 5003
+[Server] 2026/11/06 16:19:27.956755 [5002] requesting access at lamport clock=50
+[Server] 2026/11/06 16:19:27.964451 [5001] deferring reply to 5002
+[Server] 2026/11/06 16:19:27.964221 [5003] deferring reply to 5002
+[Server] 2026/11/06 16:19:28.501433 [5001] exited critical section
+[Server] 2026/11/06 16:19:28.501928 [5003] entered critical section
+[Server] 2026/11/06 16:19:29.503125 [5003] exited critical section
+[Server] 2026/11/06 16:19:29.503397 [5002] entered critical section
+[Server] 2026/11/06 16:19:30.504465 [5002] exited critical section
+[Server] 2026/11/06 16:19:30.639088 [5002] requesting access at lamport clock=57
+[Server] 2026/11/06 16:19:30.639749 [5002] entered critical section
+[Server] 2026/11/06 16:19:30.806283 [5003] requesting access at lamport clock=60
+[Server] 2026/11/06 16:19:30.806679 [5002] deferring reply to 5003
+[Server] 2026/11/06 16:19:31.152645 [5001] requesting access at lamport clock=63
+[Server] 2026/11/06 16:19:31.153005 [5003] deferring reply to 5001
+[Server] 2026/11/06 16:19:31.153005 [5002] deferring reply to 5001
+[Server] 2026/11/06 16:19:31.640073 [5002] exited critical section
+[Server] 2026/11/06 16:19:31.640381 [5003] entered critical section
+[Server] 2026/11/06 16:19:32.336217 [5002] requesting access at lamport clock=67
+[Server] 2026/11/06 16:19:32.336506 [5003] deferring reply to 5002
+[Server] 2026/11/06 16:19:32.336577 [5001] deferring reply to 5002
+[Server] 2026/11/06 16:19:32.641451 [5003] exited critical section
+[Server] 2026/11/06 16:19:32.641728 [5001] entered critical section
+[Server] 2026/11/06 16:19:32.873566 [5003] requesting access at lamport clock=71
+[Server] 2026/11/06 16:19:32.873844 [5002] deferring reply to 5003
+[Server] 2026/11/06 16:19:32.873844 [5001] deferring reply to 5003
+[Server] 2026/11/06 16:19:33.642803 [5001] exited critical section
+[Server] 2026/11/06 16:19:33.643126 [5002] entered critical section
+[Server] 2026/11/06 16:19:34.301995 [5001] requesting access at lamport clock=75
+[Server] 2026/11/06 16:19:34.302325 [5003] deferring reply to 5001
+[Server] 2026/11/06 16:19:34.302327 [5002] deferring reply to 5001
+[Server] 2026/11/06 16:19:34.644235 [5002] exited critical section
+[Server] 2026/11/06 16:19:34.644778 [5003] entered critical section
+[Server] 2026/11/06 16:19:35.645912 [5003] exited critical section
+[Server] 2026/11/06 16:19:35.646162 [5001] entered critical section
+[Server] 2026/11/06 16:19:35.738478 [5002] requesting access at lamport clock=79
+[Server] 2026/11/06 16:19:35.739018 [5001] deferring reply to 5002
+[Server] 2026/11/06 16:19:36.648727 [5001] exited critical section
+[Server] 2026/11/06 16:19:36.654102 [5002] entered critical section
+[Server] 2026/11/06 16:19:36.715054 [5003] requesting access at lamport clock=82
+[Server] 2026/11/06 16:19:36.715455 [5002] deferring reply to 5003
+[Server] 2026/11/06 16:19:37.655056 [5002] exited critical section
+[Server] 2026/11/06 16:19:37.655430 [5003] entered critical section
+[Server] 2026/11/06 16:19:38.221124 [5001] requesting access at lamport clock=85
+[Server] 2026/11/06 16:19:38.221521 [5003] deferring reply to 5001
+[Server] 2026/11/06 16:19:38.657793 [5003] exited critical section
+[Server] 2026/11/06 16:19:38.659548 [5001] entered critical section
+[Server] 2026/11/06 16:19:39.092290 [5002] requesting access at lamport clock=88
+[Server] 2026/11/06 16:19:39.092645 [5001] deferring reply to 5002
+[Server] 2026/11/06 16:19:39.617918 [5002] request to :5001 failed: rpc error: code = Unavailable desc = error reading from server: EOF
+[Server] 2026/11/06 16:19:39.617953 [5002] entered critical section
+[Server] 2026/11/06 16:19:40.619105 [5002] exited critical section

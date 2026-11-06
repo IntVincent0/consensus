@@ -1,25 +1,34 @@
 package main
 
 import (
+	"context"
+	"flag"
+	"fmt"
 	"log"
+	"math/rand"
+	"net"
 	"os"
+	"strconv"
+	"strings"
 	"sync"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	pb "consensus/grpc"
 )
 
 type Node struct {
-	nodeId int64
-	clock  string
-	state  string
-	port   int
-	mu     sync.Mutex
-	port   map[int]int
-}
+	pb.UnimplementedChitChatServiceServer
 
-type Approval struct {
-	isApproved bool
+	clock    int64
+	reqClock int64
+	state    string
+	port     int
+	mu       sync.Mutex
+	peers    map[int]pb.ChitChatServiceClient
+	deferred []chan struct{}
 }
 
 func (n *Node) tick(receivedClock int64) int64 {
@@ -29,163 +38,152 @@ func (n *Node) tick(receivedClock int64) int64 {
 	return n.clock
 }
 
-func (n *Node) Request(port int, node Node) {
+func (n *Node) Enter() {
+	n.mu.Lock()
+	n.state = "wanted"
+	n.clock++
+	n.reqClock = n.clock
+	req := &pb.AccessRequest{Port: int64(n.port), Clock: n.reqClock}
+	n.mu.Unlock()
 
+	log.Printf("[%d] requesting access at lamport clock=%d\n", n.port, n.reqClock)
+
+	var wg sync.WaitGroup
+
+	for port, service := range n.peers {
+		wg.Add(1)
+		go func(port int, service pb.ChitChatServiceClient) {
+			defer wg.Done()
+
+			reply, err := service.Request(context.Background(), req, grpc.WaitForReady(true))
+			if err != nil {
+				log.Printf("[%d] request to :%d failed: %v", n.port, port, err)
+				return
+			}
+			n.tick(reply.Clock)
+		}(port, service)
+	}
+	wg.Wait()
+
+	n.mu.Lock()
+	n.state = "held"
+	n.mu.Unlock()
 }
 
-func (n *Node) Enter(accessor Node) {
-	state = "wanted"
-	for _, p := range ports {
-		go request(p, n)
-	}
-}
+func (n *Node) Request(ctx context.Context, req *pb.AccessRequest) (*pb.Approval, error) {
+	n.mu.Lock()
+	n.clock = max(n.clock, req.Clock) + 1
 
-func main() {
-	// pick the port when starting: ex. go run . 1
-	if len(os.Args) < 2 {
-		log.Fatal("usage: go run . <port>")
-	}
-	port := os.Args[1]
+	isPriority := n.reqClock < req.Clock ||
+		(n.reqClock == req.Clock && int64(n.port) < req.Port)
+	shouldDefer := n.state == "held" || (n.state == "wanted" && isPriority)
 
-	// Connect to own port
-	url := "http:localhost:" + port
-	conn, err := grpc.NewClient(url, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("event=CONNECT_FAILED")
-	}
-	defer conn.close()
-
-	for i := 1; i <= 3; i++ {
-		if i = port 
+	if !shouldDefer {
+		n.clock++
+		time := n.clock
+		n.mu.Unlock()
+		return &pb.Approval{Clock: time}, nil
 	}
 
-	node := pb.NewChitChatServiceClient(conn)
-	n := &Node{
-		port: port,
-		state: "released"
+	ch := make(chan struct{})
+	n.deferred = append(n.deferred, ch)
+	n.mu.Unlock()
+	log.Printf("[%d] deferring reply to %d", n.port, req.Port)
+
+	select {
+	case <-ch:
+	case <-ctx.Done():
+		return nil, ctx.Err()
 	}
 
 	n.mu.Lock()
 	n.clock++
-	ts := n.clock
+	time := n.clock
 	n.mu.Unlock()
+	return &pb.Approval{Clock: time}, nil
 }
 
-// package main
+func (n *Node) Exit() {
+	n.mu.Lock()
+	n.state = "released"
+	for _, ch := range n.deferred {
+		close(ch)
+	}
+	n.deferred = nil
+	n.mu.Unlock()
+	log.Printf("[%d] exited critical section", n.port)
+}
 
-// import (
-// 	"bufio"
-// 	"context"
-// 	"fmt"
-// 	"log"
-// 	"os"
-// 	"os/signal"
-// 	"sync"
-// 	"syscall"
-// 	"uuid"
-
-// 	"google.golang.org/grpc"
-// 	"google.golang.org/grpc/credentials/insecure"
-// 	"google.golang.org/grpc/status"
-
-// 	pb "chitchat/grpc"
+// const (
+// 	firstPort = 5000
+// 	lastPort  = 5010
 // )
 
-// type Client struct {
-// 	name    string
-// 	clock   int64
-// 	mu      sync.Mutex
-// 	service pb.ChitChatServiceClient
-// }
-
-// // receives messages from the server until the stream closes
-// func (c *Client) receive(stream pb.ChitChatService_ConnectClient) {
-// 	for {
-// 		msg, err := stream.Recv()
-// 		if err != nil {
-// 			log.Printf("event=DISCONNECT client=%s reason=%q", c.name, err.Error())
-// 			fmt.Println("disconnected:", err)
-// 			return
+// func findPort() (net.Listener, int) {
+// 	for i := firstPort; i <= lastPort; i++ {
+// 		ln, err := net.Listen("tcp", fmt.Sprintf(":%d", i))
+// 		if err == nil {
+// 			return ln, i
 // 		}
-
-// 		// one tick per received message; show the server's logical time (the L in the text)
-// 		clock := c.tick(msg.Timestamp)
-// 		fmt.Printf("[%s @ %d] %s\n", msg.Sender, msg.Timestamp, msg.Content)
-// 		log.Printf("event=RECEIVE client=%s from=%s lamport=%d clock=%d msg=%q", c.name, msg.Sender, msg.Timestamp, clock, msg.Content)
 // 	}
+// 	log.Printf("No free port")
+// 	return nil, 0
 // }
 
-// func (c *Client) send(text string) {
-// 	c.mu.Lock()
-// 	c.clock++
-// 	ts := c.clock
-// 	c.mu.Unlock()
+func main() {
+	port := flag.Int("port", 0, "port this node listens on")
+	peerList := flag.String("peers", "", "comma-separated ports of the other nodes")
+	flag.Parse()
+	if *port == 0 || *peerList == "" {
+		fmt.Fprintln(os.Stderr, "usage: node -port 5001 -peers 5002,5003")
+		os.Exit(1)
+	}
 
-// 	log.Printf("event=SEND client=%s lamport=%d msg=%q", c.name, ts, text)
-// 	_, err := c.service.PostMessage(context.Background(), &pb.Message{
-// 		Sender:    c.name,
-// 		Content:   text,
-// 		Timestamp: ts,
-// 	})
-// 	if err != nil {
-// 		log.Printf("event=SEND_FAILED client=%s err=%v", c.name, err)
-// 		fmt.Println("message rejected:", status.Convert(err).Message())
-// 	}
-// }
+	// opens the log file and creates the template
+	f, err := os.OpenFile("node.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalf("could not open log file: %v", err)
+	}
+	defer f.Close() // close it once done
 
-// func main() {
-// 	// pick the username when starting: ex. go run . alice
-// 	if len(os.Args) < 2 {
-// 		log.Fatal("usage: go run . <username>")
-// 	}
-// 	name := os.Args[1]
+	log.SetOutput(f)
+	log.SetPrefix("[Server] ")
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 
-// 	f, err := os.OpenFile("client_"+name+"_"+uuid.NewV4().String()+".log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-// 	if err != nil {
-// 		log.Fatalf("could not open log file: %v", err)
-// 	}
-// 	defer f.Close()
+	// Setup listener
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	if err != nil {
+		log.Fatalf("could not listen %d: %v", *port, err)
+	}
+	node := &Node{
+		port:  *port,
+		peers: make(map[int]pb.ChitChatServiceClient),
+	}
+	log.Printf("Connected on port %d", *port)
 
-// 	log.SetOutput(f)
-// 	log.SetPrefix("[Client] ")
-// 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+	grpcServer := grpc.NewServer()
+	pb.RegisterChitChatServiceServer(grpcServer, node)
+	go grpcServer.Serve(listener)
 
-// 	url := "localhost:5050"
-// 	conn, err := grpc.NewClient(url,
-// 		grpc.WithTransportCredentials(insecure.NewCredentials()))
-// 	if err != nil {
-// 		log.Fatalf("event=CONNECT_FAILED client=%s addr=%s err=%v", name, url, err)
-// 	}
-// 	defer conn.Close()
+	for _, s := range strings.Split(*peerList, ",") {
+		p, err := strconv.Atoi(strings.TrimSpace(s))
+		if err != nil {
+			log.Fatalf("bad peer port %q: %v", s, err)
+		}
+		conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", p),
+			grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-// 	client := pb.NewChitChatServiceClient(conn)
-// 	c := &Client{name: name, service: client}
+		if err != nil {
+			log.Fatalf("client for :%d: %v", p, err)
+		}
+		node.peers[p] = pb.NewChitChatServiceClient(conn)
+	}
 
-// 	c.mu.Lock()
-// 	c.clock++
-// 	ts := c.clock
-// 	c.mu.Unlock()
-
-// 	stream, err := client.Connect(context.Background(), &pb.User{Username: name, Timestamp: ts})
-// 	if err != nil {
-// 		log.Fatalf("event=CONNECT_FAILED client=%s addr=%s err=%v", name, url, err)
-// 	}
-// 	log.Printf("event=CONNECT client=%s addr=%s lamport=%d", name, url, ts)
-
-// 	go c.receive(stream) // once receive is a method too
-
-// 	// Ctrl+C / SIGTERM: log the disconnect, then exit (closing the connection ends the stream)
-// 	sig := make(chan os.Signal, 1)
-// 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
-// 	go func() {
-// 		<-sig
-// 		log.Printf("event=DISCONNECT client=%s reason=%q", name, "interrupted")
-// 		os.Exit(0)
-// 	}()
-
-// 	scanner := bufio.NewScanner(os.Stdin)
-// 	for scanner.Scan() {
-// 		c.send(scanner.Text())
-// 	}
-// 	log.Printf("event=DISCONNECT client=%s reason=%q", name, "stdin closed")
-// }
+	for {
+		time.Sleep(time.Duration(rand.Intn(3000)) * time.Millisecond)
+		node.Enter()
+		log.Printf("[%d] entered critical section", node.port)
+		time.Sleep(time.Second)
+		node.Exit()
+	}
+}

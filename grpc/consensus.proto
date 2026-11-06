@@ -1,26 +1,16 @@
 syntax = "proto3";
 package consensus;
 
-message Nothing {}
+option go_package = "consensus/grpc";
 
 message Approval {
-    bool isApproved = 1;
+    int64 clock = 1;
 }
 
-message Node {
-    int64 nodeId = 1;
-    int64 lamport = 2;
-    int64 maxId = 3;
-}
-
-message Message {
-    string text = 1
+message AccessRequest {
+    int64 port = 1;
+    int64 clock = 2;
 }
 
 service ChitChatService {
-    rpc Request(Node) returns (Approval)
-    
-    rpc Enter(Node) returns (Nothing)
-    rpc Write(Message) returns (Nothing)
-    rpc Exit(node) returns (Nothing)
-}
+    rpc Request(AccessRequest) returns (Approval);}
